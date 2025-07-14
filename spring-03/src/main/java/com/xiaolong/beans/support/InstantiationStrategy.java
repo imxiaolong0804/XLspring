@@ -6,7 +6,7 @@ import com.xiaolong.beans.config.BeanDefinition;
 import java.lang.reflect.Constructor;
 
 /**
- * 类的简要描述.
+ * 创建实例接口
  *
  * @author baixiaolong
  * @date 2025/6/30 17:34

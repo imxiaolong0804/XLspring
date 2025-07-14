@@ -6,7 +6,9 @@
  */
 public class UserService {
 
-    String name;
+    private String name;
+
+    private UserDao userDao;
 
     public UserService() {
     }
@@ -15,8 +17,17 @@ public class UserService {
         this.name = name;
     }
 
+    public UserService(String name, UserDao userDao) {
+        this.name = name;
+        this.userDao = userDao;
+    }
+
     public void print() {
         System.out.printf("hello this is user service !!! %s \n", name);
+    }
+
+    public void queryUserInfo() {
+        System.out.printf("查询用户信息：%s \n", userDao.queryUserName(name));
     }
 
 }
