@@ -1,6 +1,6 @@
-package com.xiaolong.beans.config;
+package com.xiaolong.beans.factory.config;
 
-import com.xiaolong.PropertyValues;
+import com.xiaolong.beans.PropertyValues;
 
 /**
  * 类的简要描述.
@@ -16,11 +16,12 @@ public class BeanDefinition<T> {
 
     public BeanDefinition(Class<T> beanClass) {
         this.beanClass = beanClass;
+        this.propertyValues = new PropertyValues();
     }
 
     public BeanDefinition(Class<T> beanClass, PropertyValues propertyValues) {
         this.beanClass = beanClass;
-        this.propertyValues = propertyValues;
+        this.propertyValues = propertyValues == null ? new PropertyValues() : propertyValues;
     }
 
     public Class<T> getBeanClass() {

@@ -1,8 +1,8 @@
-package com.xiaolong.beans.support;
+package com.xiaolong.beans.factory.support;
 
-import com.xiaolong.BeansException;
-import com.xiaolong.beans.BeanFactory;
-import com.xiaolong.beans.config.BeanDefinition;
+import com.xiaolong.beans.BeansException;
+import com.xiaolong.beans.factory.BeanFactory;
+import com.xiaolong.beans.factory.config.BeanDefinition;
 
 /**
  * 类的简要描述.
@@ -22,13 +22,18 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         return doGetBean(name, args);
     }
 
-    private Object doGetBean(String name, Object[] args) {
+    private <T> T doGetBean(String name, Object[] args) {
         Object singleton = getSingleton(name);
         if (null != singleton) {
-            return singleton;
+            return (T) singleton;
         }
         BeanDefinition<?> beanDefinition = getBeanDefinition(name);
-        return createBean(name, beanDefinition, args);
+        return (T) createBean(name, beanDefinition, args);
+    }
+
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+        return (T) getBean(name);
     }
 
     protected abstract Object createBean(String name, BeanDefinition<?> beanDefinition, Object[] args);

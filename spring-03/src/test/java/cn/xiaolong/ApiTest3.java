@@ -1,5 +1,8 @@
-import com.xiaolong.beans.config.BeanDefinition;
-import com.xiaolong.beans.support.DefaultListableBeanFactory;
+package cn.xiaolong;
+
+import cn.xiaolong.bean.UserService;
+import com.xiaolong.beans.factory.config.BeanDefinition;
+import com.xiaolong.beans.factory.support.DefaultListableBeanFactory;
 
 /**
  * 类的简要描述.
@@ -13,7 +16,7 @@ public class ApiTest3 {
 
         beanFactory.registerBeanDefinition("userService", new BeanDefinition<>(UserService.class));
 
-        UserService  userService =  (UserService) beanFactory.getBean("userService", "xiaolong");
+        UserService userService = (UserService) beanFactory.getBean("userService", "xiaolong");
 
         userService.print();
 
@@ -21,7 +24,7 @@ public class ApiTest3 {
 
         singleton.print();
 
-        UserService  bean = (UserService) beanFactory.getBean("userService");
+        UserService bean = (UserService) beanFactory.getBean("userService");
 //
         bean.print();
     }

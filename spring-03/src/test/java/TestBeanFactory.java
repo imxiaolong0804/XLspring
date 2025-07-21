@@ -1,8 +1,10 @@
-import com.xiaolong.PropertyValue;
-import com.xiaolong.PropertyValues;
-import com.xiaolong.beans.config.BeanDefinition;
-import com.xiaolong.beans.config.BeanReference;
-import com.xiaolong.beans.support.DefaultListableBeanFactory;
+import cn.xiaolong.bean.UserDao;
+import cn.xiaolong.bean.UserService;
+import com.xiaolong.beans.PropertyValue;
+import com.xiaolong.beans.PropertyValues;
+import com.xiaolong.beans.factory.config.BeanDefinition;
+import com.xiaolong.beans.factory.config.BeanReference;
+import com.xiaolong.beans.factory.support.DefaultListableBeanFactory;
 import org.junit.Test;
 
 /**
@@ -20,7 +22,7 @@ public class TestBeanFactory {
 
         defaultListableBeanFactory.registerBeanDefinition("userDao", new BeanDefinition<>(UserDao.class));
 
-        UserDao  userDao = (UserDao) defaultListableBeanFactory.getBean("userDao");
+        UserDao userDao = (UserDao) defaultListableBeanFactory.getBean("userDao");
         System.out.println(userDao.queryUserName("10002"));
 
         PropertyValues propertyValues = new PropertyValues();
@@ -29,7 +31,7 @@ public class TestBeanFactory {
 
         defaultListableBeanFactory.registerBeanDefinition("userService", new BeanDefinition<>(UserService.class, propertyValues));
 
-        UserService  userService = (UserService) defaultListableBeanFactory.getBean("userService");
+        UserService userService = (UserService) defaultListableBeanFactory.getBean("userService");
         userService.print();
         userService.queryUserInfo();
     }

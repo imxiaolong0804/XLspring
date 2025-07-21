@@ -1,4 +1,4 @@
-package com.xiaolong;
+package com.xiaolong.beans;
 
 import java.util.ArrayList;
 import java.util.List;

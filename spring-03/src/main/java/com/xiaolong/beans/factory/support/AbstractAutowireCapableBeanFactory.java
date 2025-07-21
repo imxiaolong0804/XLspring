@@ -1,9 +1,9 @@
-package com.xiaolong.beans.support;
+package com.xiaolong.beans.factory.support;
 
-import com.xiaolong.PropertyValue;
-import com.xiaolong.PropertyValues;
-import com.xiaolong.beans.config.BeanDefinition;
-import com.xiaolong.beans.config.BeanReference;
+import com.xiaolong.beans.PropertyValue;
+import com.xiaolong.beans.PropertyValues;
+import com.xiaolong.beans.factory.config.BeanDefinition;
+import com.xiaolong.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;

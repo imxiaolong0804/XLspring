@@ -1,7 +1,7 @@
-package com.xiaolong.beans.support;
+package com.xiaolong.beans.factory.support;
 
-import com.xiaolong.BeansException;
-import com.xiaolong.beans.config.BeanDefinition;
+import com.xiaolong.beans.BeansException;
+import com.xiaolong.beans.factory.config.BeanDefinition;
 
 import java.lang.reflect.Constructor;
 

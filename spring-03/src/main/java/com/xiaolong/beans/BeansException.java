@@ -1,4 +1,4 @@
-package com.xiaolong;
+package com.xiaolong.beans;
 
 /**
  * 类的简要描述.

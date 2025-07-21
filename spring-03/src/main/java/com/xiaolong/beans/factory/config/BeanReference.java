@@ -1,4 +1,4 @@
-package com.xiaolong.beans.config;
+package com.xiaolong.beans.factory.config;
 
 /**
  * 类的简要描述.

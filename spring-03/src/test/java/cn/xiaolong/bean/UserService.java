@@ -1,3 +1,5 @@
+package cn.xiaolong.bean;
+
 /**
  * 类的简要描述.
  *

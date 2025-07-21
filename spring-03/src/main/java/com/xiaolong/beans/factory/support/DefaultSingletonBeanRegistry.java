@@ -1,6 +1,6 @@
-package com.xiaolong.beans.support;
+package com.xiaolong.beans.factory.support;
 
-import com.xiaolong.beans.config.SingletonBeanRegistry;
+import com.xiaolong.beans.factory.config.SingletonBeanRegistry;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;

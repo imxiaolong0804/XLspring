@@ -1,3 +1,5 @@
+package cn.xiaolong.bean;
+
 import java.util.HashMap;
 import java.util.Map;
 

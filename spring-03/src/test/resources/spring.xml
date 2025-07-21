@@ -1,0 +1,7 @@
+<beans>
+    <bean id="userDao" class="cn.xiaolong.bean.UserDao"/>
+    <bean id="userService" class="cn.xiaolong.bean.UserService">
+        <property name="name" value="10001"/>
+        <property name="userDao" ref="userDao"/>
+    </bean>
+</beans>
