@@ -3,5 +3,10 @@
     <bean id="userService" class="cn.xiaolong.bean.UserService">
         <property name="name" value="10001"/>
         <property name="userDao" ref="userDao"/>
+        <property name="company" value="滴滴"/>
+        <property name="location" value="成都"/>
     </bean>
+
+    <bean class="cn.xiaolong.common.MyBeanPostProcessor"/>
+    <bean class="cn.xiaolong.common.MyBeanFactoryPostProcessor"/>
 </beans>
