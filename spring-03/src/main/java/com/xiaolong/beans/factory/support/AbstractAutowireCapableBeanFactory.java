@@ -1,8 +1,11 @@
 package com.xiaolong.beans.factory.support;
 
+import cn.hutool.core.util.StrUtil;
 import com.xiaolong.beans.BeansException;
 import com.xiaolong.beans.PropertyValue;
 import com.xiaolong.beans.PropertyValues;
+import com.xiaolong.beans.factory.DisposableBean;
+import com.xiaolong.beans.factory.InitializingBean;
 import com.xiaolong.beans.factory.config.AutowireCapableBeanFactory;
 import com.xiaolong.beans.factory.config.BeanDefinition;
 import com.xiaolong.beans.factory.config.BeanPostProcessor;
@@ -10,6 +13,7 @@ import com.xiaolong.beans.factory.config.BeanReference;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 
 /**
  * 类的简要描述.
@@ -35,8 +39,17 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+        // 注册实现了 dis
+        registerDisposableBeanIfNecessary(name, bean, beanDefinition);
+
         addSingleton(name, bean);
         return bean;
+    }
+
+    private void registerDisposableBeanIfNecessary(String name, Object bean, BeanDefinition<?> beanDefinition) {
+        if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
+            registerDisposableBean(name, new DisposableBeanAdapter(bean,name,beanDefinition));
+        }
     }
 
     private Object initializeBean(String name, Object bean, BeanDefinition<?> beanDefinition) {
@@ -44,23 +57,37 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, name);
 
         // TODO 待完成内容
-        invokeInitMethods(name, wrappedBean, beanDefinition);
+        try {
+            invokeInitMethods(name, wrappedBean, beanDefinition);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
 
         // 执行 bean 后置处理
         wrappedBean = applyBeanPostProcessorsAfterInitialization(wrappedBean, name);
         return wrappedBean;
     }
 
-    private void invokeInitMethods(String name, Object wrappedBean, BeanDefinition<?> beanDefinition) {
-
+    private void invokeInitMethods(String name, Object wrappedBean, BeanDefinition<?> beanDefinition) throws Exception{
+        // 1 实现了 initalizingBean 接口
+        if (wrappedBean instanceof InitializingBean initial) {
+            initial.afterPropertiesSet();
+        }
+        String initMethodName = beanDefinition.getInitMethodName();
+        if (StrUtil.isNotEmpty(initMethodName)) {
+            Class<?> beanClass = beanDefinition.getBeanClass();
+            Method declaredMethod = beanClass.getDeclaredMethod(initMethodName);
+            if (null == declaredMethod) {
+                throw new RuntimeException("init method not found");
+            }
+            declaredMethod.setAccessible(true);
+            declaredMethod.invoke(wrappedBean);
+            declaredMethod.setAccessible(false);
+        }
     }
 
     /**
      * bean 属性填充
-     *
-     * @param bean
-     * @param name
-     * @param beanDefinition
      */
     private void applyPropertyValues(Object bean, String beanName, BeanDefinition<?> beanDefinition) {
         try {
@@ -78,6 +105,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
                 Field field = beanClass.getDeclaredField(name);
                 field.setAccessible(true);
                 field.set(bean, value);
+                field.setAccessible(false);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -29,6 +29,11 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         return doGetBean(name, args);
     }
 
+    @Override
+    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
+        return (T) getBean(name);
+    }
+
     private <T> T doGetBean(String name, Object[] args) {
         Object singleton = getSingleton(name);
         if (null != singleton) {
@@ -36,11 +41,6 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         }
         BeanDefinition<?> beanDefinition = getBeanDefinition(name);
         return (T) createBean(name, beanDefinition, args);
-    }
-
-    @Override
-    public <T> T getBean(String name, Class<T> requiredType) throws BeansException {
-        return (T) getBean(name);
     }
 
     protected abstract Object createBean(String name, BeanDefinition<?> beanDefinition, Object[] args);

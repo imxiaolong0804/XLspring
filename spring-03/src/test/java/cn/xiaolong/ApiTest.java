@@ -2,6 +2,7 @@ package cn.xiaolong;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.XmlUtil;
+import cn.xiaolong.bean.UserDao;
 import cn.xiaolong.bean.UserService;
 import cn.xiaolong.common.MyBeanFactoryPostProcessor;
 import cn.xiaolong.common.MyBeanPostProcessor;
@@ -17,6 +18,7 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 import java.io.InputStream;
+import java.lang.reflect.Method;
 
 /**
  * 类的简要描述.
@@ -96,4 +98,22 @@ public class ApiTest {
         userService.queryUserInfo();
     }
 
+
+    @Test
+    public void test_init() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        UserService userService = applicationContext.getBean("userService", UserService.class);
+
+        userService.queryUserInfo();
+    }
+
+    @Test
+    public void test_method() throws Exception {
+
+        UserDao userDao = new UserDao();
+        Method method = userDao.getClass().getMethod("destroyDataMethod");
+        method.invoke(userDao);
+    }
 }
