@@ -4,6 +4,7 @@ import com.xiaolong.beans.BeansException;
 import com.xiaolong.beans.factory.config.BeanDefinition;
 import com.xiaolong.beans.factory.config.BeanPostProcessor;
 import com.xiaolong.beans.factory.config.ConfigurableBeanFactory;
+import com.xiaolong.utils.ClassUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +19,7 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
 
+    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -55,5 +57,9 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
 
     protected List<BeanPostProcessor> getBeanPostProcessors() {
         return beanPostProcessors;
+    }
+
+    protected ClassLoader getDefaultClassLoader() {
+        return beanClassLoader;
     }
 }

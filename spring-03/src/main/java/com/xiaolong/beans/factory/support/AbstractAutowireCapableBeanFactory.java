@@ -4,8 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.xiaolong.beans.BeansException;
 import com.xiaolong.beans.PropertyValue;
 import com.xiaolong.beans.PropertyValues;
-import com.xiaolong.beans.factory.DisposableBean;
-import com.xiaolong.beans.factory.InitializingBean;
+import com.xiaolong.beans.factory.*;
 import com.xiaolong.beans.factory.config.AutowireCapableBeanFactory;
 import com.xiaolong.beans.factory.config.BeanDefinition;
 import com.xiaolong.beans.factory.config.BeanPostProcessor;
@@ -53,6 +52,20 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     }
 
     private Object initializeBean(String name, Object bean, BeanDefinition<?> beanDefinition) {
+
+        if (bean instanceof Aware) {
+            if (bean instanceof BeanFactoryAware factoryAware) {
+                factoryAware.setBeanFactory(this);
+            }
+            if (bean instanceof BeanNameAware beanNameAware) {
+                beanNameAware.setBeanName(name);
+            }
+            if (bean instanceof BeanClassLoaderAware classLoaderAware) {
+                classLoaderAware.setBeanClassLoader(this.getDefaultClassLoader());
+            }
+        }
+
+
         // 执行 bean 前置处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, name);
 
