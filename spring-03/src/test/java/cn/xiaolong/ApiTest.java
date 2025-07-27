@@ -134,6 +134,8 @@ public class ApiTest {
         System.out.println(userService01);
         System.out.println(userService02);
 
+        System.out.println(userService01.queryUserInfo());
+
         // 4. 打印十六进制哈希
         System.out.println(userService01 + " 十六进制哈希：" + Integer.toHexString(userService01.hashCode()));
 //        System.out.println(ClassLayout.parseInstance(userService01).toPrintable());
