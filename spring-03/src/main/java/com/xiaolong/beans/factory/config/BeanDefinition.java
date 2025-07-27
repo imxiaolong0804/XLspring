@@ -10,6 +10,10 @@ import com.xiaolong.beans.PropertyValues;
  */
 public class BeanDefinition<T> {
 
+    String SCOPE_SINGLETON = ConfigurableBeanFactory.SCOPE_SINGLETON;
+
+    String SCOPE_PROTOTYPE = ConfigurableBeanFactory.SCOPE_PROTOTYPE;
+
     private Class<T> beanClass;
 
     private PropertyValues propertyValues;
@@ -17,6 +21,19 @@ public class BeanDefinition<T> {
     private String initMethodName;
 
     private String destroyMethodName;
+
+    private String scope = SCOPE_SINGLETON;
+
+    private boolean singleton = true;
+
+    private boolean prototype = false;
+
+
+    public void setScope(String scope) {
+        this.scope = scope;
+        this.singleton = SCOPE_SINGLETON.equals(scope);
+        this.prototype = SCOPE_PROTOTYPE.equals(scope);
+    }
 
     public BeanDefinition(Class<T> beanClass) {
         this.beanClass = beanClass;
@@ -54,5 +71,9 @@ public class BeanDefinition<T> {
 
     public String getDestroyMethodName() {
         return destroyMethodName;
+    }
+
+    public boolean isSingleton() {
+        return singleton;
     }
 }

@@ -32,7 +32,7 @@ public class TestBeanFactory {
         defaultListableBeanFactory.registerBeanDefinition("userService", new BeanDefinition<>(UserService.class, propertyValues));
 
         UserService userService = (UserService) defaultListableBeanFactory.getBean("userService");
-        userService.print();
+//        userService.print();
         userService.queryUserInfo();
     }
 

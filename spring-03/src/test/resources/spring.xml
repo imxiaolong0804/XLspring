@@ -1,11 +1,13 @@
 <beans>
-    <bean id="userDao" class="cn.xiaolong.bean.UserDao" init-method="initDataMethod" destroy-method="destroyDataMethod"/>
-    <bean id="userService" class="cn.xiaolong.bean.UserService">
+<!--    <bean id="userDao" class="cn.xiaolong.bean.UserDao" init-method="initDataMethod" destroy-method="destroyDataMethod"/>-->
+    <bean id="userService" class="cn.xiaolong.bean.UserService" scope="prototype">
         <property name="uId" value="10001"/>
         <property name="company" value="腾讯"/>
         <property name="location" value="深圳"/>
-        <property name="userDao" ref="userDao"/>
+        <property name="userDao" ref="proxyUserDao"/>
     </bean>
+
+    <bean id="proxyUserDao" class="cn.xiaolong.bean.ProxyBeanFactroy"/>
 
 <!--    <bean class="cn.xiaolong.common.MyBeanPostProcessor"/>-->
 <!--    <bean class="cn.xiaolong.common.MyBeanFactoryPostProcessor"/>-->

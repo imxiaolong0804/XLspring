@@ -1,6 +1,7 @@
 package com.xiaolong.beans.factory.support;
 
 import com.xiaolong.beans.BeansException;
+import com.xiaolong.beans.factory.FactoryBean;
 import com.xiaolong.beans.factory.config.BeanDefinition;
 import com.xiaolong.beans.factory.config.BeanPostProcessor;
 import com.xiaolong.beans.factory.config.ConfigurableBeanFactory;
@@ -15,11 +16,11 @@ import java.util.List;
  * @author baixiaolong
  * @date 2025/6/30 17:13
  */
-public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry implements ConfigurableBeanFactory {
+public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport implements ConfigurableBeanFactory {
 
     private final List<BeanPostProcessor> beanPostProcessors = new ArrayList<BeanPostProcessor>();
 
-    private ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
+    private final ClassLoader beanClassLoader = ClassUtils.getDefaultClassLoader();
 
     @Override
     public Object getBean(String name) throws BeansException {
@@ -36,13 +37,29 @@ public abstract class AbstractBeanFactory extends DefaultSingletonBeanRegistry i
         return (T) getBean(name);
     }
 
-    private <T> T doGetBean(String name, Object[] args) {
+    private <T> T doGetBean(final String name,final Object[] args) {
         Object singleton = getSingleton(name);
         if (null != singleton) {
-            return (T) singleton;
+            return (T) getObjectForBeanInstance(singleton, name);
         }
         BeanDefinition<?> beanDefinition = getBeanDefinition(name);
-        return (T) createBean(name, beanDefinition, args);
+        Object bean = createBean(name, beanDefinition, args);
+        return (T) getObjectForBeanInstance(bean, name);
+    }
+
+    private Object getObjectForBeanInstance(Object beanInstance, String beanName) {
+        if (!(beanInstance instanceof FactoryBean)) {
+            return beanInstance;
+        }
+
+        Object object = getCachedObjectForFactoryBean(beanName);
+
+        if (object == null) {
+            FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
+            object = getObjectFromFactoryBean(factoryBean, beanName);
+        }
+
+        return object;
     }
 
     protected abstract Object createBean(String name, BeanDefinition<?> beanDefinition, Object[] args);

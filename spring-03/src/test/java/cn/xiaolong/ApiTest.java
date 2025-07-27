@@ -107,8 +107,8 @@ public class ApiTest {
         UserService userService = applicationContext.getBean("userService", UserService.class);
 
         userService.queryUserInfo();
-        System.out.println(userService.getBeanFactory());
-        System.out.println(userService.getApplicationContext());
+//        System.out.println(userService.getBeanFactory());
+//        System.out.println(userService.getApplicationContext());
     }
 
     @Test
@@ -117,5 +117,25 @@ public class ApiTest {
         UserDao userDao = new UserDao();
         Method method = userDao.getClass().getMethod("destroyDataMethod");
         method.invoke(userDao);
+    }
+
+    @Test
+    public void test_prototype() throws Exception {
+
+        // 1.初始化 BeanFactory
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.registerShutdownHook();
+
+        // 2. 获取Bean对象调用方法
+        UserService userService01 = applicationContext.getBean("userService", UserService.class);
+        UserService userService02 = applicationContext.getBean("userService", UserService.class);
+
+        // 3. 配置 scope="prototype/singleton"
+        System.out.println(userService01);
+        System.out.println(userService02);
+
+        // 4. 打印十六进制哈希
+        System.out.println(userService01 + " 十六进制哈希：" + Integer.toHexString(userService01.hashCode()));
+//        System.out.println(ClassLayout.parseInstance(userService01).toPrintable());
     }
 }
