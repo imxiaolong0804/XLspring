@@ -48,14 +48,13 @@ public abstract class AbstractBeanFactory extends FactoryBeanRegistrySupport imp
     }
 
     private Object getObjectForBeanInstance(Object beanInstance, String beanName) {
-        if (!(beanInstance instanceof FactoryBean)) {
+        if (!(beanInstance instanceof FactoryBean<?> factoryBean)) {
             return beanInstance;
         }
 
         Object object = getCachedObjectForFactoryBean(beanName);
 
         if (object == null) {
-            FactoryBean<?> factoryBean = (FactoryBean<?>) beanInstance;
             object = getObjectFromFactoryBean(factoryBean, beanName);
         }
 

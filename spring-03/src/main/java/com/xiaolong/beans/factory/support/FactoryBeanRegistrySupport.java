@@ -24,7 +24,7 @@ public class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry{
         return (o != NULL_OBJECT) ? o : null;
     }
 
-    protected Object getObjectFromFactoryBean(FactoryBean factory, String beanName) {
+    protected Object getObjectFromFactoryBean(FactoryBean<?> factory, String beanName) {
         if (factory.isSingleton()) {
             Object object = this.factoryBeanObjectCache.get(beanName);
             if (object == null) {
@@ -37,7 +37,7 @@ public class FactoryBeanRegistrySupport extends DefaultSingletonBeanRegistry{
         }
     }
 
-    private Object doGetObjectFromFactoryBean(final FactoryBean factory, final String beanName){
+    private Object doGetObjectFromFactoryBean(final FactoryBean<?> factory, final String beanName){
         try {
             return factory.getObject();
         } catch (Exception e) {
