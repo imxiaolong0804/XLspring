@@ -140,4 +140,12 @@ public class ApiTest {
         System.out.println(userService01 + " 十六进制哈希：" + Integer.toHexString(userService01.hashCode()));
 //        System.out.println(ClassLayout.parseInstance(userService01).toPrintable());
     }
+
+
+    @Test
+    public void test_classname() throws Exception {
+
+        Class<UserService> userServiceClass = UserService.class;
+        System.out.println(userServiceClass.getName());
+    }
 }
