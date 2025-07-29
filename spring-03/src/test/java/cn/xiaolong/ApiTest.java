@@ -6,6 +6,7 @@ import cn.xiaolong.bean.UserDao;
 import cn.xiaolong.bean.UserService;
 import cn.xiaolong.common.MyBeanFactoryPostProcessor;
 import cn.xiaolong.common.MyBeanPostProcessor;
+import cn.xiaolong.event.CustomEvent;
 import com.xiaolong.beans.factory.support.DefaultListableBeanFactory;
 import com.xiaolong.beans.factory.xml.XmlBeanDefinitionReader;
 import com.xiaolong.context.support.ClassPathXmlApplicationContext;
@@ -147,5 +148,15 @@ public class ApiTest {
 
         Class<UserService> userServiceClass = UserService.class;
         System.out.println(userServiceClass.getName());
+    }
+
+    @Test
+    public void test_event() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        applicationContext.publishEvent(new CustomEvent(applicationContext,1092012L,"hello world"));
+
+        applicationContext.registerShutdownHook();
+
+
     }
 }

@@ -4,9 +4,11 @@ import com.xiaolong.beans.BeansException;
 import com.xiaolong.beans.factory.ConfigurableListableBeanFactory;
 import com.xiaolong.beans.factory.config.BeanFactoryPostProcessor;
 import com.xiaolong.beans.factory.config.BeanPostProcessor;
+import com.xiaolong.context.ApplicationEvent;
 import com.xiaolong.context.ApplicationListener;
 import com.xiaolong.context.ConfigurableApplicationContext;
 import com.xiaolong.context.event.ApplicationEventMulticaster;
+import com.xiaolong.context.event.ContextClosedEvent;
 import com.xiaolong.context.event.ContextRefreshedEvent;
 import com.xiaolong.context.event.SimpleApplicationEventMulticaster;
 import com.xiaolong.core.io.DefaultResourceLoader;
@@ -60,8 +62,9 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
         publishEvent(new ContextRefreshedEvent(this));
     }
 
-    private void publishEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        applicationEventMulticaster.multicastEvent(contextRefreshedEvent);
+    @Override
+    public void publishEvent(ApplicationEvent event) {
+        applicationEventMulticaster.multicastEvent(event);
     }
 
     private void registerListeners() {
@@ -98,6 +101,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader i
 
     @Override
     public void close() {
+        publishEvent(new ContextClosedEvent(this));
         getBeanFactory().destroySingletons();
     }
 
