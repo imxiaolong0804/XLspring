@@ -2,11 +2,16 @@ package cn.xiaolong;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.XmlUtil;
+import cn.xiaolong.bean.IUserService;
 import cn.xiaolong.bean.UserDao;
 import cn.xiaolong.bean.UserService;
-import cn.xiaolong.common.MyBeanFactoryPostProcessor;
-import cn.xiaolong.common.MyBeanPostProcessor;
+import cn.xiaolong.bean.UserServiceInterceptor;
 import cn.xiaolong.event.CustomEvent;
+import com.xiaolong.aop.AdvisedSupport;
+import com.xiaolong.aop.TargetSource;
+import com.xiaolong.aop.aspectj.AspectJExpressionPointcut;
+import com.xiaolong.aop.framework.Cglib2AopProxy;
+import com.xiaolong.aop.framework.JdkDynamicAopProxy;
 import com.xiaolong.beans.factory.support.DefaultListableBeanFactory;
 import com.xiaolong.beans.factory.xml.XmlBeanDefinitionReader;
 import com.xiaolong.context.support.ClassPathXmlApplicationContext;
@@ -67,37 +72,38 @@ public class ApiTest {
 
     }
 
-    @Test
-    public void test_beanFactoryPostProcessorAndBeanPostProcessor() throws Exception {
-        // 1 初始化 beanfactory
-        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+//    @Test
+//    @Ignore
+//    public void test_beanFactoryPostProcessorAndBeanPostProcessor() throws Exception {
+//        // 1 初始化 beanfactory
+//        DefaultListableBeanFactory beanFactory = new DefaultListableBeanFactory();
+//
+//        // 2 读取配置
+//        XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
+//        xmlBeanDefinitionReader.loadBeanDefinitions("classpath:spring.xml");
+//
+//        // 3  BeanDefinition 加载完成 & Bean实例化之前，修改 BeanDefinition 的属性值
+//        MyBeanFactoryPostProcessor myBeanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
+//        myBeanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
+//
+//        // 4. Bean实例化之后，修改 Bean 属性信息
+//        MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
+//        beanFactory.addBeanPostProcessor(myBeanPostProcessor);
+//
+//        // 5. 获取Bean对象调用方法
+//        UserService userService = beanFactory.getBean("userService", UserService.class);
+//        userService.queryUserInfo();
+//    }
 
-        // 2 读取配置
-        XmlBeanDefinitionReader xmlBeanDefinitionReader = new XmlBeanDefinitionReader(beanFactory);
-        xmlBeanDefinitionReader.loadBeanDefinitions("classpath:spring.xml");
-
-        // 3  BeanDefinition 加载完成 & Bean实例化之前，修改 BeanDefinition 的属性值
-        MyBeanFactoryPostProcessor myBeanFactoryPostProcessor = new MyBeanFactoryPostProcessor();
-        myBeanFactoryPostProcessor.postProcessBeanFactory(beanFactory);
-
-        // 4. Bean实例化之后，修改 Bean 属性信息
-        MyBeanPostProcessor myBeanPostProcessor = new MyBeanPostProcessor();
-        beanFactory.addBeanPostProcessor(myBeanPostProcessor);
-
-        // 5. 获取Bean对象调用方法
-        UserService userService = beanFactory.getBean("userService", UserService.class);
-        userService.queryUserInfo();
-    }
-
-    @Test
-    public void test_useContext() throws Exception {
-        // 1 初始化 beanfactory
-        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
-
-        // 2 获取 bean 对象调用方法
-        UserService userService = applicationContext.getBean("userService", UserService.class);
-        userService.queryUserInfo();
-    }
+//    @Test
+//    public void test_useContext() throws Exception {
+//        // 1 初始化 beanfactory
+//        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+//
+//        // 2 获取 bean 对象调用方法
+//        UserService userService = applicationContext.getBean("userService", UserService.class);
+//        userService.queryUserInfo();
+//    }
 
 
     @Test
@@ -145,7 +151,6 @@ public class ApiTest {
 
     @Test
     public void test_classname() throws Exception {
-
         Class<UserService> userServiceClass = UserService.class;
         System.out.println(userServiceClass.getName());
     }
@@ -153,10 +158,50 @@ public class ApiTest {
     @Test
     public void test_event() throws Exception {
         ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
-        applicationContext.publishEvent(new CustomEvent(applicationContext,1092012L,"hello world"));
+        applicationContext.publishEvent(new CustomEvent(applicationContext, 1092012L, "hello world"));
 
         applicationContext.registerShutdownHook();
 
 
+    }
+
+//    @Test
+//    public void test_proxy_method() throws Exception {
+//        UserService userService = new UserService();
+//
+//    }
+
+
+    @Test
+    public void test_aaa() throws Exception {
+        AspectJExpressionPointcut aspectJExpressionPointcut = new AspectJExpressionPointcut("execution(* cn.xiaolong.bean.UserService.*(..))");
+        Class<UserService> userServiceClass = UserService.class;
+        Method method = userServiceClass.getDeclaredMethod("queryUserInfo");
+
+        System.out.println(aspectJExpressionPointcut.matches(userServiceClass));
+        System.out.println(aspectJExpressionPointcut.matches(method, userServiceClass));
+
+    }
+
+    @Test
+    public void test_dynamic() throws Exception {
+        // 目标对象
+        IUserService userService = new UserService();
+
+        // 组装代理信息
+        AdvisedSupport advisedSupport = new AdvisedSupport();
+        advisedSupport.setTargetSource(new TargetSource(userService));
+        advisedSupport.setMethodInterceptor(new UserServiceInterceptor());
+        advisedSupport.setMethodMatcher(new AspectJExpressionPointcut("execution(* cn.xiaolong.bean.IUserService.*(..))"));
+
+        // 代理对象(JdkDynamicAopProxy)
+        IUserService proxy_jdk = (IUserService) new JdkDynamicAopProxy(advisedSupport).getProxy();
+        // 测试调用
+        System.out.println("测试结果：" + proxy_jdk.queryUserInfo());
+
+        // 代理对象(Cglib2AopProxy)
+        IUserService proxy_cglib = (IUserService) new Cglib2AopProxy(advisedSupport).getProxy();
+        // 测试调用
+        System.out.println("测试结果：" + proxy_cglib.register("花花"));
     }
 }
