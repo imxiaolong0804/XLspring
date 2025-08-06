@@ -5,10 +5,7 @@ import com.xiaolong.beans.BeansException;
 import com.xiaolong.beans.PropertyValue;
 import com.xiaolong.beans.PropertyValues;
 import com.xiaolong.beans.factory.*;
-import com.xiaolong.beans.factory.config.AutowireCapableBeanFactory;
-import com.xiaolong.beans.factory.config.BeanDefinition;
-import com.xiaolong.beans.factory.config.BeanPostProcessor;
-import com.xiaolong.beans.factory.config.BeanReference;
+import com.xiaolong.beans.factory.config.*;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
@@ -30,6 +27,11 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
     protected Object createBean(String name, BeanDefinition<?> beanDefinition, Object[] args) {
         Object bean;
         try {
+            // 判断是否返回代理 bean 对象
+            bean = resolveBeforeInstantiation(name, beanDefinition);
+            if (null != bean) {
+                return bean;
+            }
             // jdk 或者 cglib 创建实例
             bean = createBeanInstance(beanDefinition, name, args);
             applyPropertyValues(bean, name, beanDefinition);
@@ -47,13 +49,32 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return bean;
     }
 
+    protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
+        Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        if (null != bean) {
+            bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
+        }
+        return bean;
+    }
+
+    // 注意，此方法为新增方法，与 “applyBeanPostProcessorBeforeInitialization” 是两个方法
+    public Object applyBeanPostProcessorBeforeInstantiation(Class<?> beanClass, String beanName) throws BeansException {
+        for (BeanPostProcessor processor : getBeanPostProcessors()) {
+            if (processor instanceof InstantiationAwareBeanPostProcessor) {
+                Object result = ((InstantiationAwareBeanPostProcessor) processor).postProcessBeforeInstantiation(beanClass, beanName);
+                if (null != result) return result;
+            }
+        }
+        return null;
+    }
+
     private void registerDisposableBeanIfNecessary(String name, Object bean, BeanDefinition<?> beanDefinition) {
         // 如果不是单例模式，直接返回
         if (!beanDefinition.isSingleton()) {
             return;
         }
         if (bean instanceof DisposableBean || StrUtil.isNotEmpty(beanDefinition.getDestroyMethodName())) {
-            registerDisposableBean(name, new DisposableBeanAdapter(bean,name,beanDefinition));
+            registerDisposableBean(name, new DisposableBeanAdapter(bean, name, beanDefinition));
         }
     }
 
@@ -87,7 +108,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         return wrappedBean;
     }
 
-    private void invokeInitMethods(String name, Object wrappedBean, BeanDefinition<?> beanDefinition) throws Exception{
+    private void invokeInitMethods(String name, Object wrappedBean, BeanDefinition<?> beanDefinition) throws Exception {
         // 1 实现了 initalizingBean 接口
         if (wrappedBean instanceof InitializingBean initial) {
             initial.afterPropertiesSet();
