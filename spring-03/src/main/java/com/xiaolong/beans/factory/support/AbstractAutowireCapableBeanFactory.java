@@ -96,7 +96,6 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         // 执行 bean 前置处理
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, name);
 
-        // TODO 待完成内容
         try {
             invokeInitMethods(name, wrappedBean, beanDefinition);
         } catch (Exception e) {

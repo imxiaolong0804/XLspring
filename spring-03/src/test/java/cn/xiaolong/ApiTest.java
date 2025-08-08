@@ -43,10 +43,27 @@ public class ApiTest {
 
     @Test
     public void test_classpath() throws Exception {
-        Resource resource = resourceLoader.getResource("classpath:important.properties");
+        Resource resource = resourceLoader.getResource("classpath:token.properties");
         InputStream inputStream = resource.getInputStream();
         String content = IoUtil.readUtf8(inputStream);
         System.out.println(content);
+    }
+
+
+    @Test
+    public void test_property() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-property.xml");
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        userService.queryUserInfo();
+        System.out.println(userService);
+    }
+
+    @Test
+    public void test_scan() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring-scan.xml");
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        System.out.println(userService.queryUserInfo());
+
     }
 
     // 第六章 资源加载测试

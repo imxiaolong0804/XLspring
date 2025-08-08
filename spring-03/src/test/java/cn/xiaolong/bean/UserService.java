@@ -1,5 +1,7 @@
 package cn.xiaolong.bean;
 
+import com.xiaolong.stereotype.Component;
+
 import java.util.Random;
 
 /**
@@ -8,9 +10,11 @@ import java.util.Random;
  * @author baixiaolong
  * @date 2025/7/27 22:01
  */
+@Component("userService")
 public class UserService implements IUserService {
 
-    @Override
+    private String token;
+
     public String queryUserInfo() {
         try {
             Thread.sleep(new Random(1).nextInt(100));
@@ -20,7 +24,6 @@ public class UserService implements IUserService {
         return "小傅哥，100001，深圳";
     }
 
-    @Override
     public String register(String userName) {
         try {
             Thread.sleep(new Random(1).nextInt(100));
@@ -30,34 +33,16 @@ public class UserService implements IUserService {
         return "注册用户：" + userName + " success！";
     }
 
-//    private String uId;
-//    private String company;
-//    private String location;
-//    private IUserDao userDao;
-//
-//    public String queryUserInfo() {
-//        return userDao.queryUserName(uId) + "," + company + "," + location;
-//    }
-//
-//    public void setUserDao(IUserDao userDao) {
-//        this.userDao = userDao;
-//    }
-//    public void setUId(String uId) {
-//        this.uId = uId;
-//    }
-//    public void setCompany(String company) {
-//        this.company = company;
-//    }
-//    public void setLocation(String location) {
-//        this.location = location;
-//    }
-//    public IUserDao getUserDao() {
-//        return userDao;
-//    }
-//    public String getUId() {
-//        return uId;
-//    }
-//    public String getCompany() {
-//        return company;
-//    }
+    @Override
+    public String toString() {
+        return "UserService#token = { " + token + " }";
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
 }
