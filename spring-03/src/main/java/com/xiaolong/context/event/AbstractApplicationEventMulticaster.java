@@ -66,7 +66,7 @@ public abstract class AbstractApplicationEventMulticaster implements Application
         Class<? extends ApplicationListener> listenerClass = listener.getClass();
 
         // 2. 处理代理类情况 - 如果是CGLIB代理，获取其父类
-        Class<?> targetClass = ClassUtils.isCjlibProxyClass(listenerClass) ?
+        Class<?> targetClass = ClassUtils.isCglibProxyClass(listenerClass) ?
                 listenerClass.getSuperclass() : listenerClass;
 
         // 3. 获取第一个泛型接口（ApplicationListener接口）

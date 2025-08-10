@@ -24,22 +24,41 @@
 
 <!--</beans>-->
 
-<beans>
+<!--<beans>-->
 
-    <bean id="userService" class="cn.xiaolong.bean.UserService"/>
+<!--    <bean id="userService" class="cn.xiaolong.bean.UserService"/>-->
 
-    <bean class="com.xiaolong.aop.framework.autoProxy.DefaultAdvisorAutoProxyCreator"/>
+<!--    <bean class="com.xiaolong.aop.framework.autoProxy.DefaultAdvisorAutoProxyCreator"/>-->
 
-    <bean id="beforeAdvice" class="cn.xiaolong.bean.UserServiceBeforeAdvice"/>
+<!--    <bean id="beforeAdvice" class="cn.xiaolong.bean.UserServiceBeforeAdvice"/>-->
 
-    <bean id="methodInterceptor" class="com.xiaolong.aop.framework.adapter.MethodBeforeAdviceInterceptor">
-        <property name="advice" ref="beforeAdvice"/>
+<!--    <bean id="methodInterceptor" class="com.xiaolong.aop.framework.adapter.MethodBeforeAdviceInterceptor">-->
+<!--        <property name="advice" ref="beforeAdvice"/>-->
+<!--    </bean>-->
+
+<!--    <bean id="pointcutAdvisor" class="com.xiaolong.aop.aspectj.AspectJExpressionPointcutAdvisor">-->
+<!--        <property name="expression" value="execution(* cn.xiaolong.bean.IUserService.*(..))"/>-->
+<!--        <property name="advice" ref="methodInterceptor"/>-->
+<!--    </bean>-->
+
+<!--</beans>-->
+
+
+<!--<?xml version="1.0" encoding="UTF-8"?>-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+	         http://www.springframework.org/schema/beans/spring-beans.xsd
+		 http://www.springframework.org/schema/context">
+
+    <bean class="com.xiaolong.beans.factory.PropertyPlaceholderConfigurer">
+        <property name="location" value="classpath:token.properties"/>
     </bean>
 
-    <bean id="pointcutAdvisor" class="com.xiaolong.aop.aspectj.AspectJExpressionPointcutAdvisor">
-        <property name="expression" value="execution(* cn.xiaolong.bean.IUserService.*(..))"/>
-        <property name="advice" ref="methodInterceptor"/>
-    </bean>
+    <context:component-scan base-package="cn.xiaolong.bean"/>
 
 </beans>
+
+
 

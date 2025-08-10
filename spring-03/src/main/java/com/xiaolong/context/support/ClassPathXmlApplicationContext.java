@@ -28,4 +28,9 @@ public class ClassPathXmlApplicationContext extends AbstractXmlApplicationContex
     protected String[] getConfigLocations() {
         return configLocations;
     }
+
+    @Override
+    public <T> T getBean(Class<T> requiredType) throws BeansException {
+        return getBeanFactory().getBean(requiredType);
+    }
 }

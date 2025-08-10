@@ -49,6 +49,14 @@ public class ApiTest {
         System.out.println(content);
     }
 
+    @Test
+    public void test_scan2() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        IUserService userService = applicationContext.getBean("userService", IUserService.class);
+        System.out.println(userService.queryUserInfo());
+        System.out.println(userService);
+    }
+
 
     @Test
     public void test_property() throws Exception {

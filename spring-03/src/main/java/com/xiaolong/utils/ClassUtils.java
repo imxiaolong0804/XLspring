@@ -21,11 +21,11 @@ public class ClassUtils {
         return cl;
     }
 
-    public static boolean isCjlibProxyClass(Class<?> clazz) {
-        return (clazz != null && isCjlibProxyClassName(clazz.getName()));
+    public static boolean isCglibProxyClass(Class<?> clazz) {
+        return (clazz != null && isCglibProxyClassName(clazz.getName()));
     }
 
-    private static boolean isCjlibProxyClassName(String name) {
+    private static boolean isCglibProxyClassName(String name) {
         return (name != null && name.contains("$$"));
     }
 

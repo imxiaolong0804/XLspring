@@ -1,6 +1,7 @@
 package com.xiaolong.context.annotation;
 
 import cn.hutool.core.util.StrUtil;
+import com.xiaolong.beans.factory.annotation.AutowiredAnnotationBeanPostProcessor;
 import com.xiaolong.beans.factory.config.BeanDefinition;
 import com.xiaolong.beans.factory.support.BeanDefinitionRegistry;
 import com.xiaolong.stereotype.Component;
@@ -33,6 +34,7 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
                 registry.registerBeanDefinition(determineBeanName(beanDefinition), beanDefinition);
             }
         }
+        registry.registerBeanDefinition("com.xiaolong.context.annotation.internalAutowiredAnnotationProcessor", new BeanDefinition<>(AutowiredAnnotationBeanPostProcessor.class));
     }
 
     private String resolveBeanScope(BeanDefinition<?> beanDefinition) {

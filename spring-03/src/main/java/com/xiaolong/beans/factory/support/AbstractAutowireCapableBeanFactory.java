@@ -34,6 +34,8 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             }
             // jdk 或者 cglib 创建实例
             bean = createBeanInstance(beanDefinition, name, args);
+            // 在实例化属性之前，允许 beanPostProcessor 修改属性值
+            applyBeanPostProcessorsBeforeApplyingPropertyValues(name, bean, beanDefinition);
             applyPropertyValues(bean, name, beanDefinition);
             // 执行 bean 的初始化方法 和 beanPostProcessor 的前置和后置处理方法
             bean = initializeBean(name, bean, beanDefinition);
@@ -47,6 +49,19 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
             addSingleton(name, bean);
         }
         return bean;
+    }
+
+    private void applyBeanPostProcessorsBeforeApplyingPropertyValues(String name, Object bean, BeanDefinition<?> beanDefinition) {
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
+                PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, name);
+                if (null != pvs) {
+                    for (PropertyValue propertyValue : pvs.getPropertyValues()) {
+                        beanDefinition.getPropertyValues().addPropertyValue(propertyValue);
+                    }
+                }
+            }
+        }
     }
 
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {

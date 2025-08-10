@@ -4,6 +4,7 @@ import com.xiaolong.aop.*;
 import com.xiaolong.aop.aspectj.AspectJExpressionPointcutAdvisor;
 import com.xiaolong.aop.framework.ProxyFactory;
 import com.xiaolong.beans.BeansException;
+import com.xiaolong.beans.PropertyValues;
 import com.xiaolong.beans.factory.BeanFactory;
 import com.xiaolong.beans.factory.BeanFactoryAware;
 import com.xiaolong.beans.factory.config.InstantiationAwareBeanPostProcessor;
@@ -55,6 +56,11 @@ public class DefaultAdvisorAutoProxyCreator implements InstantiationAwareBeanPos
         }
 
         return null;
+    }
+
+    @Override
+    public PropertyValues postProcessPropertyValues(PropertyValues pvs, Object bean, String beanName) throws BeansException {
+        return pvs;
     }
 
     private boolean isInfrastructureClass(Class<?> beanClass) {
