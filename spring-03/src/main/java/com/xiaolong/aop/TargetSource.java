@@ -1,5 +1,7 @@
 package com.xiaolong.aop;
 
+import com.xiaolong.utils.ClassUtils;
+
 /**
  * 类的简要描述.
  *
@@ -23,7 +25,10 @@ public class TargetSource {
      * @return the type of targets returned by this {@link TargetSource}
      */
     public Class<?>[] getTargetClass() {
-        return this.target.getClass().getInterfaces();
+        Class<?> clazz = this.getTarget().getClass();
+        // 需要判断一下是否是 cglib 代理
+        clazz = ClassUtils.isCglibProxyClass(clazz) ? clazz.getSuperclass() : clazz;
+        return clazz.getInterfaces();
     }
 
     /**

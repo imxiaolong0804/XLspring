@@ -66,6 +66,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     protected Object resolveBeforeInstantiation(String beanName, BeanDefinition beanDefinition) {
         Object bean = applyBeanPostProcessorBeforeInstantiation(beanDefinition.getBeanClass(), beanName);
+        // todo 这里应该有一个处理像 有 value 注解这些的
         if (null != bean) {
             bean = applyBeanPostProcessorsAfterInitialization(bean, beanName);
         }
@@ -108,7 +109,7 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
         }
 
 
-        // 执行 bean 前置处理
+        // 执行 bean 前置处理, 然后像 实现了 applicatonaware 等的接口的在这里就会进行注入额
         Object wrappedBean = applyBeanPostProcessorsBeforeInitialization(bean, name);
 
         try {
