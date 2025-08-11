@@ -25,36 +25,63 @@ public abstract class AbstractAutowireCapableBeanFactory extends AbstractBeanFac
 
     @Override
     protected Object createBean(String name, BeanDefinition<?> beanDefinition, Object[] args) {
+        Object bean = resolveBeforeInstantiation(name, beanDefinition);
+        if (null != bean) {
+            return bean;
+        }
+        return doCreateBean(name, beanDefinition, args);
+    }
+
+    private Object doCreateBean(String name, BeanDefinition<?> beanDefinition, Object[] args) {
         Object bean;
         try {
-            // 判断是否返回代理 bean 对象
-            bean = resolveBeforeInstantiation(name, beanDefinition);
-            if (null != bean) {
-                return bean;
-            }
-            // jdk 或者 cglib 创建实例
+            // 实例化
             bean = createBeanInstance(beanDefinition, name, args);
-            // 在实例化属性之前，允许 beanPostProcessor 修改属性值
+
+            // 处理循环依赖，将实例化后的 bean 对象提前放入缓存中暴露出来
+            if (beanDefinition.isSingleton()) {
+                Object finalBean = bean;
+                addSingletonFactory(name, () -> getEarlyBeanReference(name, beanDefinition, finalBean));
+            }
+            // 在设置 bean 属性之前，允许 BeanPostProcessor 修改属性值
             applyBeanPostProcessorsBeforeApplyingPropertyValues(name, bean, beanDefinition);
+            // 给 Bean 填充属性
             applyPropertyValues(bean, name, beanDefinition);
-            // 执行 bean 的初始化方法 和 beanPostProcessor 的前置和后置处理方法
             bean = initializeBean(name, bean, beanDefinition);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new BeansException(e.getMessage(), e);
         }
+
         // 注册实现了 disposable 接口的
         registerDisposableBeanIfNecessary(name, bean, beanDefinition);
-
+        Object exposedObject = bean;
         if (beanDefinition.isSingleton()) {
-            addSingleton(name, bean);
+            // 获取代理对象
+            exposedObject = getSingleton(name);
+            registerSingleton(name, exposedObject);
         }
-        return bean;
+        return exposedObject;
+    }
+
+    private Object getEarlyBeanReference(String name, BeanDefinition<?> beanDefinition, Object finalBean) {
+        Object exposedObject = finalBean;
+        for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor instantiationAwareBeanPostProcessor) {
+                exposedObject = instantiationAwareBeanPostProcessor.getEarlyBeanReference(finalBean, name);
+                if (null == exposedObject) {
+                    return null;
+                }
+            }
+        }
+        return exposedObject;
     }
 
     private void applyBeanPostProcessorsBeforeApplyingPropertyValues(String name, Object bean, BeanDefinition<?> beanDefinition) {
         for (BeanPostProcessor beanPostProcessor : getBeanPostProcessors()) {
-            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor){
-                PropertyValues pvs = ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(beanDefinition.getPropertyValues(), bean, name);
+            if (beanPostProcessor instanceof InstantiationAwareBeanPostProcessor) {
+                PropertyValues pvs =
+                        ((InstantiationAwareBeanPostProcessor) beanPostProcessor).postProcessPropertyValues(beanDefinition.getPropertyValues(),
+                                bean, name);
                 if (null != pvs) {
                     for (PropertyValue propertyValue : pvs.getPropertyValues()) {
                         beanDefinition.getPropertyValues().addPropertyValue(propertyValue);

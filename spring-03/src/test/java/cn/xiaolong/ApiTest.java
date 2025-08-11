@@ -2,10 +2,7 @@ package cn.xiaolong;
 
 import cn.hutool.core.io.IoUtil;
 import cn.hutool.core.util.XmlUtil;
-import cn.xiaolong.bean.IUserService;
-import cn.xiaolong.bean.UserDao;
-import cn.xiaolong.bean.UserService;
-import cn.xiaolong.bean.UserServiceInterceptor;
+import cn.xiaolong.bean.*;
 import cn.xiaolong.event.CustomEvent;
 import com.xiaolong.aop.AdvisedSupport;
 import com.xiaolong.aop.TargetSource;
@@ -39,6 +36,16 @@ public class ApiTest {
     @Before
     public void inti() {
         resourceLoader = new DefaultResourceLoader();
+    }
+
+
+    @Test
+    public void test_circular() throws Exception {
+        ClassPathXmlApplicationContext applicationContext = new ClassPathXmlApplicationContext("classpath:spring.xml");
+        Husband husband = applicationContext.getBean("husband", Husband.class);
+        Wife wife = applicationContext.getBean("wife", Wife.class);
+        System.out.println("老公的媳妇：" + husband.queryWife());
+        System.out.println("媳妇的老公：" + wife.queryHusband());
     }
 
     @Test

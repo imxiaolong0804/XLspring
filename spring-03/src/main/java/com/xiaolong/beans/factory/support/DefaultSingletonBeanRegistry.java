@@ -1,8 +1,10 @@
 package com.xiaolong.beans.factory.support;
 
 import com.xiaolong.beans.factory.DisposableBean;
+import com.xiaolong.beans.factory.ObjectFactory;
 import com.xiaolong.beans.factory.config.SingletonBeanRegistry;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -17,13 +19,33 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
 
     protected static final Object NULL_OBJECT = new Object();
 
+    // 一级缓存，普通对象
     private final Map<String, Object> singletonObjects = new ConcurrentHashMap<>();
+
+    // 二级缓存，提前暴漏对象，没有完全实例化的对象
+    private final Map<String, Object> earlySingletonObjects = new HashMap<>();
+
+    // 三级缓存，存放代理对象
+    private final Map<String, ObjectFactory<?>> singletonFactories = new HashMap<>();
 
     private final Map<String, DisposableBean> disposableBeans = new ConcurrentHashMap<>();
 
     @Override
     public Object getSingleton(String name) {
-        return singletonObjects.get(name);
+        Object singletonObject = singletonObjects.get(name);
+        if (null == singletonObject) {
+            singletonObject = earlySingletonObjects.get(name);
+            if (null == singletonObject) {
+                ObjectFactory<?> objectFactory = singletonFactories.get(name);
+                if (null != objectFactory) {
+                    singletonObject = objectFactory.getObject();
+                    // 把三级缓存中的代理对象中的真实对象获取出来，放入二级缓存中
+                    earlySingletonObjects.put(name, singletonObject);
+                    singletonFactories.remove(name);
+                }
+            }
+        }
+        return singletonObject;
     }
 
     @Override
@@ -45,6 +67,15 @@ public class DefaultSingletonBeanRegistry implements SingletonBeanRegistry {
     @Override
     public void registerSingleton(String beanName, Object singletonObject) {
         singletonObjects.put(beanName, singletonObject);
+        earlySingletonObjects.remove(beanName);
+        singletonFactories.remove(beanName);
+    }
+
+    public void addSingletonFactory(String beanName, ObjectFactory<?> objectFactory) {
+        if (!singletonFactories.containsKey(beanName)) {
+            singletonFactories.put(beanName, objectFactory);
+            earlySingletonObjects.remove(beanName);
+        }
     }
 
     protected void addSingleton(String name, Object bean) {

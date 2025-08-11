@@ -52,11 +52,37 @@
 	         http://www.springframework.org/schema/beans/spring-beans.xsd
 		 http://www.springframework.org/schema/context">
 
-    <bean class="com.xiaolong.beans.factory.PropertyPlaceholderConfigurer">
-        <property name="location" value="classpath:token.properties"/>
+<!--    <bean class="com.xiaolong.beans.factory.PropertyPlaceholderConfigurer">-->
+<!--        <property name="location" value="classpath:token.properties"/>-->
+<!--    </bean>-->
+
+<!--    <context:component-scan base-package="cn.xiaolong.bean"/>-->
+
+
+    <bean id="husband" class="cn.xiaolong.bean.Husband">
+        <property name="wife" ref="wife"/>
     </bean>
 
-    <context:component-scan base-package="cn.xiaolong.bean"/>
+    <bean id="wife" class="cn.xiaolong.bean.Wife">
+        <property name="husband" ref="husband"/>
+        <property name="mother" ref="husbandMother"/>
+    </bean>
+
+    <bean id="husbandMother" class="cn.xiaolong.bean.HusbandMother"/>
+
+    <!-- AOP 配置，验证三级缓存 -->
+    <bean class="com.xiaolong.aop.framework.autoProxy.DefaultAdvisorAutoProxyCreator"/>
+
+    <bean id="beforeAdvice" class="cn.xiaolong.bean.SpouseAdvice"/>
+
+    <bean id="methodInterceptor" class="com.xiaolong.aop.framework.adapter.MethodBeforeAdviceInterceptor">
+        <property name="advice" ref="beforeAdvice"/>
+    </bean>
+
+    <bean id="pointcutAdvisor" class="com.xiaolong.aop.aspectj.AspectJExpressionPointcutAdvisor">
+        <property name="expression" value="execution(* cn.xiaolong.bean.Wife.*(..))"/>
+        <property name="advice" ref="methodInterceptor"/>
+    </bean>
 
 </beans>
 
