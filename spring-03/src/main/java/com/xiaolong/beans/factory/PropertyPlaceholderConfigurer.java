@@ -32,6 +32,7 @@ public class PropertyPlaceholderConfigurer implements BeanFactoryPostProcessor {
         // 加载属性文件
         try {
             DefaultResourceLoader resourceLoader = new DefaultResourceLoader();
+            // 配置文件的路径
             Resource resource = resourceLoader.getResource(location);
             Properties properties = new Properties();
             properties.load(resource.getInputStream());
